@@ -1,0 +1,55 @@
+# 쇼핑몰별 컬럼 매핑 설정.
+# file_pattern: 이 설정을 적용할 엑셀 파일명 패턴 (fnmatch 글롭 문법)
+# date_format: 해당 쇼핑몰 주문일시 컬럼의 strptime 형식
+# columns: { 원본 컬럼명: 공통 스키마 필드명 }
+#
+# 공통 스키마 필드: order_id, order_date, product, quantity, unit_price,
+#                   total_amount(선택, 없으면 quantity*unit_price로 계산), buyer, status
+
+sources:
+  shop_a:
+    file_pattern: "shop_a_*.xlsx"
+    date_format: "%Y-%m-%d %H:%M"
+    columns:
+      "Order No": order_id
+      "Order Date": order_date
+      "Item Name": product
+      "Qty": quantity
+      "Unit Price": unit_price
+      "Customer": buyer
+      "Status": status
+
+  shop_b:
+    file_pattern: "shop_b_*.xlsx"
+    date_format: "%Y.%m.%d %H:%M"
+    columns:
+      "주문번호": order_id
+      "주문일시": order_date
+      "상품명": product
+      "수량": quantity
+      "판매단가": unit_price
+      "구매자명": buyer
+      "주문상태": status
+
+  shop_c:
+    file_pattern: "shop_c_*.xlsx"
+    date_format: "%d/%m/%Y %H:%M"
+    columns:
+      "ord_no": order_id
+      "ord_dt": order_date
+      "item": product
+      "cnt": quantity
+      "price_ea": unit_price
+      "amount": total_amount
+      "cust_nm": buyer
+      "st": status
+
+canonical_fields:
+  - order_id
+  - order_date
+  - product
+  - quantity
+  - unit_price
+  - total_amount
+  - buyer
+  - status
