@@ -29,8 +29,10 @@
 ```bash
 python -m venv .venv
 source .venv/bin/activate   # Windows는 .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -e .
 ```
+
+(`pip install -e .`로 실행에 필요한 라이브러리와 `excel-automation` 명령어가 함께 설치됩니다.)
 
 ### 2. 쇼핑몰 주문 엑셀 준비
 
@@ -41,7 +43,7 @@ pip install -r requirements.txt
 ### 3. 실행
 
 ```bash
-python -m excel_automation.cli run \
+excel-automation run \
   --input-dir sample_data \
   --mapping config/column_mapping.yaml \
   --output-dir output
@@ -64,5 +66,6 @@ python -m excel_automation.cli run \
 ## 개발/테스트
 
 ```bash
+pip install -r requirements.txt   # pytest 설치
 pytest
 ```
