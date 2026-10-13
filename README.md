@@ -1,6 +1,6 @@
 # 쇼핑몰 주문 엑셀 자동 정리 도구
 
-[![CI](https://github.com/Junoh-Lee111/01-excel-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/Junoh-Lee111/01-excel-automation/actions/workflows/ci.yml)
+[![CI](https://github.com/Andrea-star-dev/01-excel-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/Andrea-star-dev/01-excel-automation/actions/workflows/ci.yml)
 
 여러 쇼핑몰(스마트스토어, 쿠팡, 자사몰 등)에서 내려받은 **컬럼 형식이 서로 다른** 주문 엑셀을
 한 번에 합쳐서, 보기 좋게 정리된 엑셀 리포트와 매출 요약 메일을 자동으로 만들어주는 도구입니다.
