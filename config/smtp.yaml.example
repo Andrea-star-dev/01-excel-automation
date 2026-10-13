@@ -1,0 +1,10 @@
+# 이 파일을 config/smtp.yaml로 복사해서 실제 값을 채우면 메일 발송 모드로 동작합니다.
+# 복사한 config/smtp.yaml은 git에 커밋되지 않습니다 (.gitignore 처리됨).
+host: "smtp.gmail.com"
+port: 587
+username: "your-account@gmail.com"
+password: "app-password-here"
+from_addr: "your-account@gmail.com"
+to_addrs:
+  - "owner@example.com"
+use_tls: true

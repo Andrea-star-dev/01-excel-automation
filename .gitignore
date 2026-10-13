@@ -5,3 +5,4 @@ output/*.xlsx
 output/*.html
 .pytest_cache/
 .DS_Store
+config/smtp.yaml
