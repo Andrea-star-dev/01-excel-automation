@@ -64,32 +64,109 @@ def build_html_summary(orders: pd.DataFrame) -> str:
         .head(5)
     )
 
+    th_style = (
+        "text-align:left;padding:10px 14px;background:#4C56B8;color:#ffffff;"
+        "font:600 12px/1.4 'Manrope',Helvetica,Arial,sans-serif;"
+        "letter-spacing:0.3px;text-transform:uppercase;"
+    )
+    td_style = (
+        "padding:10px 14px;border-bottom:1px solid #ECE9F4;"
+        "font:14px/1.5 'Manrope',Helvetica,Arial,sans-serif;color:#2B2A3A;"
+    )
+
     rows = "".join(
-        f"<tr><td>{date}</td><td>{count}건</td><td>{qty}개</td>"
-        f"<td>{revenue:,.0f}원</td></tr>"
+        f'<tr><td style="{td_style}">{date}</td><td style="{td_style}">{count}건</td>'
+        f'<td style="{td_style}">{qty}개</td>'
+        f'<td style="{td_style}font-weight:600;">{revenue:,.0f}원</td></tr>'
         for date, count, qty, revenue in summary.itertuples(index=False)
     )
     top_rows = "".join(
-        f"<tr><td>{product}</td><td>{revenue:,.0f}원</td></tr>"
+        f'<tr><td style="{td_style}">{product}</td>'
+        f'<td style="{td_style}font-weight:600;">{revenue:,.0f}원</td></tr>'
         for product, revenue in top_products.items()
     )
 
+    # 이메일 클라이언트(특히 Outlook)는 flex/grid/그라디언트를 지원하지 않으므로
+    # 표 기반 레이아웃 + 인라인 스타일로 작성한다. 03 챗봇과 같은 인디고/골드
+    # 팔레트를 쓰되, 폰트가 차단돼도 무난하도록 안전한 폴백을 둔다.
     return f"""\
 <html>
-<body style="font-family: sans-serif;">
-  <h2>일일 매출 리포트</h2>
-  <p>총 주문 {total_orders}건 / 총 매출 <b>{total_revenue:,.0f}원</b></p>
+<head>
+<meta charset="utf-8">
+<style>
+  @media (max-width: 600px) {{
+    .container {{ width: 100% !important; }}
+  }}
+</style>
+</head>
+<body style="margin:0;padding:32px 16px;background:#F3F2F8;">
+  <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0"
+         style="margin:0 auto;max-width:600px;background:#ffffff;border:1px solid #E7E4F2;border-radius:16px;overflow:hidden;">
+    <tr>
+      <td style="height:6px;background:#5B63D6;font-size:0;line-height:0;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="padding:36px 36px 24px;">
+        <div style="font:italic 500 12px/1.4 Georgia,'Newsreader',serif;letter-spacing:0.5px;color:#8B8FA3;text-transform:uppercase;margin-bottom:6px;">
+          Daily Sales Report
+        </div>
+        <div style="font:700 24px/1.3 'Manrope',Helvetica,Arial,sans-serif;color:#1C1B2E;margin-bottom:16px;">
+          일일 매출 리포트
+        </div>
+        <div style="font:14px/1.6 'Manrope',Helvetica,Arial,sans-serif;color:#55536B;">
+          총 주문 <b style="color:#1C1B2E;">{total_orders}건</b> · 총 매출
+          <b style="color:#9A7B1E;">{total_revenue:,.0f}원</b>
+        </div>
+      </td>
+    </tr>
 
-  <h3>날짜별 요약</h3>
-  <table border="1" cellpadding="6" cellspacing="0">
-    <tr><th>날짜</th><th>주문 수</th><th>판매 수량</th><th>매출</th></tr>
-    {rows}
-  </table>
+    <tr>
+      <td style="padding:0 36px 8px;">
+        <div style="font:700 11px/1.4 'Manrope',Helvetica,Arial,sans-serif;letter-spacing:0.6px;color:#8B8FA3;text-transform:uppercase;padding-top:12px;border-top:1px solid #ECE9F4;">
+          날짜별 요약
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px 28px 20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+          <tr>
+            <th style="{th_style}border-top-left-radius:8px;">날짜</th>
+            <th style="{th_style}">주문 수</th>
+            <th style="{th_style}">판매 수량</th>
+            <th style="{th_style}border-top-right-radius:8px;">매출</th>
+          </tr>
+          {rows}
+        </table>
+      </td>
+    </tr>
 
-  <h3>매출 상위 상품</h3>
-  <table border="1" cellpadding="6" cellspacing="0">
-    <tr><th>상품</th><th>매출</th></tr>
-    {top_rows}
+    <tr>
+      <td style="padding:0 36px 8px;">
+        <div style="font:700 11px/1.4 'Manrope',Helvetica,Arial,sans-serif;letter-spacing:0.6px;color:#8B8FA3;text-transform:uppercase;padding-top:4px;border-top:1px solid #ECE9F4;">
+          매출 상위 상품
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px 28px 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+          <tr>
+            <th style="{th_style}border-top-left-radius:8px;">상품</th>
+            <th style="{th_style}border-top-right-radius:8px;">매출</th>
+          </tr>
+          {top_rows}
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding:16px 36px;background:#FAF8F2;border-top:1px solid #ECE9F4;">
+        <span style="font:12px/1.5 'Manrope',Helvetica,Arial,sans-serif;color:#9A9AA8;">
+          자동 생성된 리포트입니다.
+        </span>
+      </td>
+    </tr>
   </table>
 </body>
 </html>

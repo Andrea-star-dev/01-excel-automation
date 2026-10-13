@@ -11,9 +11,13 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from excel_automation.aggregate import daily_product_summary, daily_summary
 
-HEADER_FILL = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
+# 브랜드 팔레트: 인디고(헤더) + 골드(합계 강조) — 03 챗봇 UI와 통일.
+# 폰트는 지정하지 않는다 (받는 사람 PC에 없는 폰트를 지정하면 깨져 보일 수 있어
+# 기본 폰트를 그대로 둔다 — Numbers 날짜 서식 버그로 한번 데인 교훈).
+HEADER_FILL = PatternFill(start_color="4C56B8", end_color="4C56B8", fill_type="solid")
 HEADER_FONT = Font(color="FFFFFF", bold=True)
-TOTAL_FONT = Font(bold=True)
+TOTAL_FILL = PatternFill(start_color="FBF1D6", end_color="FBF1D6", fill_type="solid")
+TOTAL_FONT = Font(bold=True, color="8A6D1C")
 CURRENCY_FORMAT = "#,##0"
 CURRENCY_COLUMNS = {"unit_price", "total_amount", "revenue_total"}
 
@@ -75,6 +79,9 @@ def _write_sheet(writer: pd.ExcelWriter, df: pd.DataFrame, sheet_name: str) -> W
 
 def _append_total_row(ws: Worksheet, df: pd.DataFrame, numeric_columns: list[str]) -> None:
     total_row = ws.max_row + 1
+    for col_idx in range(1, len(df.columns) + 1):
+        ws.cell(row=total_row, column=col_idx).fill = TOTAL_FILL
+
     ws.cell(row=total_row, column=1, value="합계").font = TOTAL_FONT
     for idx, col in enumerate(df.columns, start=1):
         if col in numeric_columns:
