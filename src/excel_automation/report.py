@@ -1,6 +1,7 @@
 """서식이 적용된 엑셀 리포트 생성 (헤더 스타일, 통화 서식, 합계 행)."""
 from __future__ import annotations
 
+import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -37,11 +38,37 @@ def _apply_currency_format(ws: Worksheet, df: pd.DataFrame) -> None:
                 ws.cell(row=row, column=idx).number_format = CURRENCY_FORMAT
 
 
+def _apply_date_format(ws: Worksheet, df: pd.DataFrame) -> None:
+    """pandas가 openpyxl에 쓰는 기본 날짜 서식(YYYY-MM-DD 등, 대문자)은 Excel에서는
+    눈감아주지만 Numbers 등 다른 프로그램에서는 토큰을 못 알아보고 그대로 깨져서
+    보인다. 소문자 서식으로 직접 덮어쓴다. (pandas ExcelWriter의 date_format /
+    datetime_format 옵션은 openpyxl 엔진 + datetime64 컬럼 조합에서는 적용되지
+    않아서, to_excel 이후 셀에 직접 설정해야 한다.)
+    """
+    for idx, col in enumerate(df.columns, start=1):
+        series = df[col]
+        if pd.api.types.is_datetime64_any_dtype(series):
+            fmt = "yyyy-mm-dd hh:mm:ss"
+        elif (
+            series.dtype == object
+            and len(series)
+            and isinstance(series.iloc[0], datetime.date)
+            and not isinstance(series.iloc[0], datetime.datetime)
+        ):
+            fmt = "yyyy-mm-dd"
+        else:
+            continue
+
+        for row in range(2, ws.max_row + 1):
+            ws.cell(row=row, column=idx).number_format = fmt
+
+
 def _write_sheet(writer: pd.ExcelWriter, df: pd.DataFrame, sheet_name: str) -> Worksheet:
     df.to_excel(writer, sheet_name=sheet_name, index=False)
     ws = writer.sheets[sheet_name]
     _style_header(ws)
     _apply_currency_format(ws, df)
+    _apply_date_format(ws, df)
     _autofit_columns(ws, df)
     return ws
 
